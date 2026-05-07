@@ -22,7 +22,7 @@ struct FMPointSelectorFactorConfigEntryData
 	UMPointSelectorQueryFactor_Base* Selector = nullptr;
 };
 
-UCLASS()
+UCLASS(BlueprintType)
 class MPOINTSELECTORQUERY_API UMPointSelectorQuerySettingsAsset : public UDataAsset
 {
 	GENERATED_BODY()

@@ -7,6 +7,7 @@
 #include "MMath.h"
 #include "MPointSelectorQueryFactor.h"
 #include "MPointSelectorQueryFilter.h"
+#include "MPointSelectorQueryModule.h"
 #include "MPointSelectorQuerySettingsAsset.h"
 #include "MSelectorQueryPoint.h"
 #include "Engine/OverlapResult.h"
@@ -109,7 +110,7 @@ namespace
 		{
 			if (FactorConfig.Selector == nullptr)
 			{
-				M::Debug::LogUserError(LogTemp,
+				M::Debug::LogUserError(LogPointSelectorQuery,
 				                       TEXT("Can't apply selector factor to score because SelectorFactorConfig.Selector is null"),
 				                       SettingsAsset);
 				continue;
@@ -120,6 +121,8 @@ namespace
 			Score += FactorValue * FactorConfig.Weight;
 		}
 
+		// TODO: remove this in favor of VLOGs? problem is that with VLOGs we can't filter specific query,
+		//		so maybe we should still use bDebug and only then VLOG the points
 		if (SettingsAsset->bDebug)
 		{
 			DrawDebugString(WorldContextObject->GetWorld(),
@@ -143,7 +146,7 @@ bool UMPointSelectorQueryLibrary::PointSelectorQuery(const UObject* WorldContext
 {
 	if (WorldContextObject == nullptr)
 	{
-		M::Debug::LogUserError(LogTemp, TEXT("Can't query point because WorldContextObject is null"), WorldContextObject);
+		M::Debug::LogUserError(LogPointSelectorQuery, TEXT("Can't query point because WorldContextObject is null"), WorldContextObject);
 		return false;
 	}
 
@@ -155,7 +158,7 @@ bool UMPointSelectorQueryLibrary::PointSelectorQuery(const UObject* WorldContext
 
 	if (SettingsAsset == nullptr)
 	{
-		M::Debug::LogUserError(LogTemp, TEXT("Can't query point because SettingsAsset is null"), WorldContextObject);
+		M::Debug::LogUserError(LogPointSelectorQuery, TEXT("Can't query point because SettingsAsset is null"), WorldContextObject);
 		return false;
 	}
 
@@ -182,8 +185,8 @@ bool UMPointSelectorQueryLibrary::PointSelectorQuery(const UObject* WorldContext
 
 		const float Score = CalculateScore(WorldContextObject, SettingsAsset, ReferenceLocation, ReferenceDirection, LookAtPoint);
 
-		UE_VLOG_SPHERE(WorldContextObject, LogTemp, Display, LookAtPoint->Execute_GetLookAtLocation(LookAtPoint.GetObject()), 10.f,
-		               FColor::Green, TEXT("%.2f"), Score);
+		UE_VLOG_SPHERE(WorldContextObject, LogPointSelectorQuery, Display, LookAtPoint->Execute_GetLookAtLocation(LookAtPoint.GetObject()),
+		               10.f, FColor::Green, TEXT("%.2f"), Score);
 
 		if (Score > ScoreBest)
 		{
@@ -205,7 +208,7 @@ TArray<FMPointSelectorQueryScoredPointData> UMPointSelectorQueryLibrary::QueryPo
 
 	if (WorldContextObject == nullptr)
 	{
-		M::Debug::LogUserError(LogTemp, TEXT("Can't query point because WorldContextObject is null"), WorldContextObject);
+		M::Debug::LogUserError(LogPointSelectorQuery, TEXT("Can't query point because WorldContextObject is null"), WorldContextObject);
 		return MoveTemp(Result);
 	}
 
@@ -217,7 +220,7 @@ TArray<FMPointSelectorQueryScoredPointData> UMPointSelectorQueryLibrary::QueryPo
 
 	if (SettingsAsset == nullptr)
 	{
-		M::Debug::LogUserError(LogTemp, TEXT("Can't query point because SettingsAsset is null"), WorldContextObject);
+		M::Debug::LogUserError(LogPointSelectorQuery, TEXT("Can't query point because SettingsAsset is null"), WorldContextObject);
 		return MoveTemp(Result);
 	}
 
@@ -245,8 +248,8 @@ TArray<FMPointSelectorQueryScoredPointData> UMPointSelectorQueryLibrary::QueryPo
 
 		Result.Emplace(LookAtPoint, Score);
 
-		UE_VLOG_SPHERE(WorldContextObject, LogTemp, Display, LookAtPoint->Execute_GetLookAtLocation(LookAtPoint.GetObject()), 10.f,
-		               FColor::Green, TEXT("%.2f"), Score);
+		UE_VLOG_SPHERE(WorldContextObject, LogPointSelectorQuery, Display, LookAtPoint->Execute_GetLookAtLocation(LookAtPoint.GetObject()),
+		               10.f, FColor::Green, TEXT("%.2f"), Score);
 	}
 
 	// Sort from highest to lowest
